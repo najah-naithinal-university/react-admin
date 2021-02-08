@@ -13,6 +13,7 @@ import renderWithRedux from './renderWithRedux';
 import warning from './warning';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useSafeSetState, useTimeout } from './hooks';
+export * from './indexById';
 
 export {
     escapePath,
