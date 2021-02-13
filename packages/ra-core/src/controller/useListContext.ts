@@ -1,4 +1,5 @@
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
+import merge from 'lodash/merge';
 
 import ListContext from './ListContext';
 import { ListControllerProps } from './useListController';
@@ -91,26 +92,75 @@ const useListContext = <RecordType extends Record = Record>(
     props?: any
 ): ListControllerProps<RecordType> => {
     const context = useContext(ListContext);
-    if (!context.resource) {
-        /**
-         * The element isn't inside a <ListContext.Provider>
-         *
-         * This may only happen when using Datagrid / SimpleList / SingleFieldList components
-         * outside of a List / ReferenceManyField / ReferenceArrayField -
-         * which isn't documented but tolerated.
-         * To avoid breakage in that case, fallback to props
-         *
-         * @deprecated - to be removed in 4.0
-         */
-        if (process.env.NODE_ENV !== 'production') {
-            console.log(
-                "List components must be used inside a <ListContext.Provider>. Relying on props rather than context to get List data and callbacks is deprecated and won't be supported in the next major version of react-admin."
-            );
-        }
-        return props;
-    }
-    // @ts-ignore
-    return context;
+    // Props take precedence over the context
+    return useMemo(
+        () =>
+            merge(
+                {},
+                context,
+                props != null ? extractListContextProps(props) : {}
+            ),
+        [context, props]
+    );
 };
+
+/**
+ * Extract only the list controller props
+ *
+ * @param {Object} props Props passed to the useListContext hook
+ *
+ * @returns {ListControllerProps} List controller props
+ */
+const extractListContextProps = ({
+    basePath,
+    currentSort,
+    data,
+    defaultTitle,
+    displayedFilters,
+    filterValues,
+    hasCreate,
+    hideFilter,
+    ids,
+    loaded,
+    loading,
+    onSelect,
+    onToggleItem,
+    onUnselectItems,
+    page,
+    perPage,
+    resource,
+    selectedIds,
+    setFilters,
+    setPage,
+    setPerPage,
+    setSort,
+    showFilter,
+    total,
+}) => ({
+    basePath,
+    currentSort,
+    data,
+    defaultTitle,
+    displayedFilters,
+    filterValues,
+    hasCreate,
+    hideFilter,
+    ids,
+    loaded,
+    loading,
+    onSelect,
+    onToggleItem,
+    onUnselectItems,
+    page,
+    perPage,
+    resource,
+    selectedIds,
+    setFilters,
+    setPage,
+    setPerPage,
+    setSort,
+    showFilter,
+    total,
+});
 
 export default useListContext;
